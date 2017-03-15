@@ -1,3 +1,5 @@
+#include <Servo.h>
+
 int A = 2;
 int B = 3;
 int C = 4;
@@ -7,6 +9,8 @@ int F = 7;
 int G = 8;
 
 int buzzer = 12;
+
+Servo motor;
 
 const int digit_patterns[10][7] = {
 // A  B  C  D  E  F  G
@@ -25,7 +29,7 @@ const int digit_patterns[10][7] = {
 
 void setup() {
 
-  Serial.begin(9600);
+  //Serial.begin(9600);
 
   pinMode(A, OUTPUT);
   pinMode(B, OUTPUT);
@@ -36,6 +40,8 @@ void setup() {
   pinMode(G, OUTPUT);
 
   pinMode(buzzer, OUTPUT);
+
+  motor.attach(9);
 
 }
 
@@ -53,7 +59,7 @@ void display_digit(byte digit){
 
 void loop() {
 
-  for(int i = 5; i >= 0; --i){
+ /* for(int i = 5; i >= 0; --i){
     display_digit(i);
     Serial.println(i);
     delay(1000);
@@ -65,6 +71,19 @@ void loop() {
     digitalWrite(buzzer, LOW);
     delay(2);
   }
-  
-
+*/
+  motor.write(90);
+  delay(100);
+  motor.write(150);
+  delay(100);
+/*  int pos = 0;
+for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+    // in steps of 1 degree
+    motor.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(15);                       // waits 15ms for the servo to reach the position
+  }
+  for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+    motor.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(15);                       // waits 15ms for the servo to reach the position
+  }*/
 }
