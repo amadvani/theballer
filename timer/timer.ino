@@ -11,10 +11,12 @@ const int E = 6;
 const int F = 7;
 const int G = 8;
 
-int buzzer = 12;
+const int buzzer = 13;
 
 const int steps = 200;
 const int speed = 100;
+
+int stage = 0;
 
 Stepper motor(steps, 9, 11, 10, 12);
 
@@ -64,25 +66,40 @@ void display_digit(byte digit){
 
 void loop() {
 
-  for(int i = 5; i >= 0; --i){
-    display_digit(i);
-    Serial.println(i);
-    delay(1000);
-  }
+  if(stage < 2){
 
-  for(int j = 0; j <= 250; j++){
-    digitalWrite(buzzer, HIGH);
-    delay(2);
-    digitalWrite(buzzer, LOW);
-    delay(2);
-  }
+   for(int i = 5; i >= 0; --i){
+     display_digit(i);
+     Serial.println(i);
+     delay(1000);
+   }
 
-  for(int k = 0; k <= 500; ++k){
-    motor.step(steps / 100);
-  }
+   for(int j = 0; j <= 250; j++){
+     digitalWrite(buzzer, HIGH);
+     delay(2);
+     digitalWrite(buzzer, LOW);
+     delay(2);
+   }
+
+  if(stage == 0){
+    for(int k = 0; k <= 300; ++k){
+        motor.step(-steps / 100);
+      }
   
-  for(int l = 0; l <= 500; ++l){
-    motor.step(-steps / 100);
+      for(int l = 0; l <= 300; ++l){
+        motor.step(steps / 100);
+      }
+      stage++;
+    }else if(stage == 1){
+      for(int k = 0; k <= 300; ++k){
+          motor.step(steps / 100);
+        }
+  
+      for(int l = 0; l <= 300; ++l){
+          motor.step(-steps / 100);
+        }
+      stage++;
+    }
   }
   
 }
