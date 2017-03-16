@@ -1,17 +1,20 @@
 #include <Stepper.h>
 
-int A = 2;
-int B = 3;
-int C = 4;
-int D = 5;
-int E = 6;
-int F = 7;
-int G = 8;
+const int button1 = 0;
+const int button2 = 0;
+
+const int A = 2;
+const int B = 3;
+const int C = 4;
+const int D = 5;
+const int E = 6;
+const int F = 7;
+const int G = 8;
 
 int buzzer = 12;
 
 const int steps = 200;
-const int speed = 30;
+const int speed = 100;
 
 Stepper motor(steps, 9, 11, 10, 12);
 
@@ -43,7 +46,7 @@ void setup() {
   pinMode(G, OUTPUT);
 
   pinMode(buzzer, OUTPUT);
-
+  
   motor.setSpeed(speed);
 
 }
@@ -74,10 +77,12 @@ void loop() {
     delay(2);
   }
 
-  motor.step(2);
-  delay(1000);
-  motor.step(-2);
-  delay(1000);
-  motor.step(0);
+  for(int k = 0; k <= 500; ++k){
+    motor.step(steps / 100);
+  }
+  
+  for(int l = 0; l <= 500; ++l){
+    motor.step(-steps / 100);
+  }
   
 }
