@@ -1,4 +1,4 @@
-#include <Servo.h>
+#include <Stepper.h>
 
 int A = 2;
 int B = 3;
@@ -10,7 +10,10 @@ int G = 8;
 
 int buzzer = 12;
 
-Servo motor;
+const int steps = 200;
+const int speed = 30;
+
+Stepper motor(steps, 9, 11, 10, 12);
 
 const int digit_patterns[10][7] = {
 // A  B  C  D  E  F  G
@@ -41,7 +44,7 @@ void setup() {
 
   pinMode(buzzer, OUTPUT);
 
-  motor.attach(9);
+  motor.setSpeed(speed);
 
 }
 
@@ -50,16 +53,15 @@ void display_digit(byte digit){
   if(digit > 9)
     return;
     
-  for(int j = 0; j < 7; ++j){
-    if(digit_patterns[digit][j]) digitalWrite(A+j, HIGH);
-    else digitalWrite(A+j, LOW);
+  for(int i = 0; i < 7; ++i){
+    digitalWrite(A+i, digit_patterns[digit][i]);
   }
   
 }
 
 void loop() {
 
- /* for(int i = 5; i >= 0; --i){
+  for(int i = 5; i >= 0; --i){
     display_digit(i);
     Serial.println(i);
     delay(1000);
@@ -71,19 +73,11 @@ void loop() {
     digitalWrite(buzzer, LOW);
     delay(2);
   }
-*/
-  motor.write(90);
-  delay(100);
-  motor.write(150);
-  delay(100);
-/*  int pos = 0;
-for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
-    // in steps of 1 degree
-    motor.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(15);                       // waits 15ms for the servo to reach the position
-  }
-  for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
-    motor.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(15);                       // waits 15ms for the servo to reach the position
-  }*/
+
+  motor.step(2);
+  delay(1000);
+  motor.step(-2);
+  delay(1000);
+  motor.step(0);
+  
 }
