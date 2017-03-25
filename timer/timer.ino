@@ -16,7 +16,20 @@ const int buzzer = 13;
 const int steps = 200;
 const int speed = 100;
 
-int stage = 0;
+const int stage_time = 5;
+
+int buzzer_countdown = stage_time;
+
+unsigned long buzzer_time = millis();
+unsigned long countdown_timer = 0;
+unsigned long motor_time = 0;
+unsigned long currentMillis = 0;
+
+bool buzz = false;
+bool exec_stage = false;
+
+int motor_stage = 0;
+int time_stage = 0;
 
 Stepper motor(steps, 9, 11, 10, 12);
 
@@ -37,8 +50,6 @@ const int digit_patterns[10][7] = {
 
 void setup() {
 
-  //Serial.begin(9600);
-
   pinMode(A, OUTPUT);
   pinMode(B, OUTPUT);
   pinMode(C, OUTPUT);
@@ -50,6 +61,8 @@ void setup() {
   pinMode(buzzer, OUTPUT);
   
   motor.setSpeed(speed);
+
+  display_digit(buzzer_countdown);
 
 }
 
@@ -66,40 +79,58 @@ void display_digit(byte digit){
 
 void loop() {
 
-  if(stage < 2){
+  currentMillis = millis();
 
-   for(int i = 5; i >= 0; --i){
-     display_digit(i);
-     Serial.println(i);
-     delay(1000);
+  if(buzz && currentMillis - buzzer_time < 1000){
+   digitalWrite(buzzer, HIGH);
+   delay(2);
+   digitalWrite(buzzer, LOW);
+   delay(2);
+  }else if(buzz){
+   buzz = false;
+   buzzer_time = currentMillis;
+  }
+
+  if(motor_stage < 2){
+
+   if(currentMillis - countdown_timer >= 1000){
+    display_digit(--buzzer_countdown);
+    countdown_timer = currentMillis;
    }
 
-   for(int j = 0; j <= 250; j++){
-     digitalWrite(buzzer, HIGH);
-     delay(2);
-     digitalWrite(buzzer, LOW);
-     delay(2);
+   if(buzzer_countdown == 0){
+    time_stage++;
+    exec_stage = true;
+    buzz = true;
+    buzzer_time = currentMillis;
+    motor_time = currentMillis;
+    if(time_stage < 2)buzzer_countdown=stage_time;
+    else buzzer_countdown = 0;
+    display_digit(buzzer_countdown);
    }
 
-  if(stage == 0){
-    for(int k = 0; k <= 300; ++k){
+  if(motor_stage == 0){
+      if(exec_stage && currentMillis - motor_time < 1000){
         motor.step(-steps / 100);
-      }
-  
-      for(int l = 0; l <= 300; ++l){
+      }else if (exec_stage && currentMillis - motor_time < 1600){
         motor.step(steps / 100);
+      }else if(exec_stage){
+        motor_time = currentMillis;
+        exec_stage = false;
+        motor_stage++;
       }
-      stage++;
-    }else if(stage == 1){
-      for(int k = 0; k <= 300; ++k){
-          motor.step(steps / 100);
-        }
-  
-      for(int l = 0; l <= 300; ++l){
-          motor.step(-steps / 100);
-        }
-      stage++;
+    }else if(motor_stage == 1){
+      if(exec_stage && currentMillis - motor_time < 1000){
+        motor.step(steps / 100);
+      }else if (exec_stage && currentMillis - motor_time < 1600){
+        motor.step(-steps / 100);
+      }else if(exec_stage){
+        motor_time = currentMillis;
+        exec_stage = false;
+        motor_stage++;
+      }
     }
   }
+  
   
 }
