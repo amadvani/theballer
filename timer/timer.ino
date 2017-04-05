@@ -1,8 +1,5 @@
 #include <Stepper.h>
 
-const int button1 = 0;
-const int button2 = 0;
-
 const int A = 2;
 const int B = 3;
 const int C = 4;
@@ -12,6 +9,8 @@ const int F = 7;
 const int G = 8;
 
 const int buzzer = 13;
+
+const int hall_effect = A0;
 
 const int steps = 200;
 const int speed = 100;
@@ -27,6 +26,7 @@ unsigned long currentMillis = 0;
 
 bool buzz = false;
 bool exec_stage = false;
+bool run = false;
 
 int motor_stage = 0;
 int time_stage = 0;
@@ -59,6 +59,8 @@ void setup() {
   pinMode(G, OUTPUT);
 
   pinMode(buzzer, OUTPUT);
+
+  pinMode(hall_effect, INPUT);
   
   motor.setSpeed(speed);
 
@@ -79,56 +81,61 @@ void display_digit(byte digit){
 
 void loop() {
 
-  currentMillis = millis();
-
-  if(buzz && currentMillis - buzzer_time < 1000){
-   digitalWrite(buzzer, HIGH);
-   delay(2);
-   digitalWrite(buzzer, LOW);
-   delay(2);
-  }else if(buzz){
-   buzz = false;
-   buzzer_time = currentMillis;
+  if(analogRead(hall_effect) < 1000){
+    run = true;
   }
+  if(run == true){
+    currentMillis = millis();
 
-  if(motor_stage < 2){
-
-   if(currentMillis - countdown_timer >= 1000){
-    display_digit(--buzzer_countdown);
-    countdown_timer = currentMillis;
-   }
-
-   if(buzzer_countdown == 0){
-    time_stage++;
-    exec_stage = true;
-    buzz = true;
+    if(buzz && currentMillis - buzzer_time < 1000){
+    digitalWrite(buzzer, HIGH);
+    delay(2);
+    digitalWrite(buzzer, LOW);
+    delay(2);
+    }else if(buzz){
+    buzz = false;
     buzzer_time = currentMillis;
-    motor_time = currentMillis;
-    if(time_stage < 2)buzzer_countdown=stage_time;
-    else buzzer_countdown = 0;
-    display_digit(buzzer_countdown);
-   }
+    }
 
-  if(motor_stage == 0){
-      if(exec_stage && currentMillis - motor_time < 1000){
-        motor.step(-steps / 100);
-      }else if (exec_stage && currentMillis - motor_time < 1600){
-        motor.step(steps / 100);
-      }else if(exec_stage){
-        motor_time = currentMillis;
-        exec_stage = false;
-        motor_stage++;
-      }
-    }else if(motor_stage == 1){
-      if(exec_stage && currentMillis - motor_time < 1000){
-        motor.step(steps / 100);
-      }else if (exec_stage && currentMillis - motor_time < 1600){
-        motor.step(-steps / 100);
-      }else if(exec_stage){
-        motor_time = currentMillis;
-        exec_stage = false;
-        motor_stage++;
-      }
+    if(motor_stage < 2){
+
+    if(currentMillis - countdown_timer >= 1000){
+      display_digit(--buzzer_countdown);
+      countdown_timer = currentMillis;
+    }
+
+    if(buzzer_countdown == 0){
+      time_stage++;
+      exec_stage = true;
+      buzz = true;
+      buzzer_time = currentMillis;
+      motor_time = currentMillis;
+      if(time_stage < 2)buzzer_countdown=stage_time;
+      else buzzer_countdown = 0;
+      display_digit(buzzer_countdown);
+    }
+
+    if(motor_stage == 0){
+        if(exec_stage && currentMillis - motor_time < 1000){
+          motor.step(-steps / 100);
+        }else if (exec_stage && currentMillis - motor_time < 1600){
+          motor.step(steps / 100);
+        }else if(exec_stage){
+          motor_time = currentMillis;
+          exec_stage = false;
+          motor_stage++;
+        }
+      }else if(motor_stage == 1){
+        if(exec_stage && currentMillis - motor_time < 1000){
+          motor.step(steps / 100);
+        }else if (exec_stage && currentMillis - motor_time < 1600){
+          motor.step(-steps / 100);
+        }else if(exec_stage){
+          motor_time = currentMillis;
+          exec_stage = false;
+          motor_stage++;
+        }
+     }
     }
   }
   
