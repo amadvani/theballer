@@ -10,7 +10,7 @@ const int G = 8;
 
 const int buzzer = 13;
 
-const int hall_effect = A0;
+const int hall_effect = A5;
 
 const int steps = 200;
 const int speed = 100;
@@ -81,7 +81,7 @@ void display_digit(byte digit){
 
 void loop() {
 
-  if(analogRead(hall_effect) < 1000){
+  if(analogRead(hall_effect) < 900){
     run = true;
   }
   if(run == true){
@@ -116,20 +116,20 @@ void loop() {
     }
 
     if(motor_stage == 0){
-        if(exec_stage && currentMillis - motor_time < 1000){
-          motor.step(-steps / 100);
-        }else if (exec_stage && currentMillis - motor_time < 1600){
+        if(exec_stage && currentMillis - motor_time < 2000){
           motor.step(steps / 100);
+        }else if (exec_stage && currentMillis - motor_time < 1600){
+          //motor.step(-steps / 100);
         }else if(exec_stage){
           motor_time = currentMillis;
           exec_stage = false;
           motor_stage++;
         }
       }else if(motor_stage == 1){
-        if(exec_stage && currentMillis - motor_time < 1000){
-          motor.step(steps / 100);
-        }else if (exec_stage && currentMillis - motor_time < 1600){
+        if(exec_stage && currentMillis - motor_time < 4000){
           motor.step(-steps / 100);
+        }else if (exec_stage && currentMillis - motor_time < 6000){
+          motor.step(steps / 100);
         }else if(exec_stage){
           motor_time = currentMillis;
           exec_stage = false;
