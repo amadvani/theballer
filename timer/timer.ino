@@ -49,7 +49,7 @@ const int digit_patterns[10][7] = {
 
 
 void setup() {
-
+  
   pinMode(A, OUTPUT);
   pinMode(B, OUTPUT);
   pinMode(C, OUTPUT);
@@ -87,49 +87,46 @@ void loop() {
   if(run == true){
     currentMillis = millis();
 
-    if(buzz && currentMillis - buzzer_time < 1000){
-    digitalWrite(buzzer, HIGH);
-    delay(2);
-    digitalWrite(buzzer, LOW);
-    delay(2);
-    }else if(buzz){
-    buzz = false;
-    buzzer_time = currentMillis;
-    }
-
     if(motor_stage < 2){
 
     if(currentMillis - countdown_timer >= 1000){
-      display_digit(--buzzer_countdown);
+      display_digit(buzzer_countdown--);
       countdown_timer = currentMillis;
     }
 
-    if(buzzer_countdown == 0){
+    if(buzzer_countdown == -1 && time_stage == 0){
       time_stage++;
       exec_stage = true;
-      buzz = true;
-      buzzer_time = currentMillis;
       motor_time = currentMillis;
       if(time_stage < 2)buzzer_countdown=stage_time;
       else buzzer_countdown = 0;
-      display_digit(buzzer_countdown);
+    }
+    
+    if(buzzer_countdown == 0 && time_stage > 0){
+      time_stage++;
+      exec_stage = true;
+      motor_time = currentMillis;
+      if(time_stage < 2)buzzer_countdown=stage_time;
+      else buzzer_countdown = 0;
     }
 
     if(motor_stage == 0){
-        if(exec_stage && currentMillis - motor_time < 2000){
+        if(exec_stage && currentMillis - motor_time < 1500){
+          digitalWrite(buzzer, HIGH);
+          motor.step(-steps / 100);
+        }else if (exec_stage && currentMillis - motor_time < 3500){
           motor.step(steps / 100);
-        }else if (exec_stage && currentMillis - motor_time < 1600){
-          //motor.step(-steps / 100);
         }else if(exec_stage){
           motor_time = currentMillis;
           exec_stage = false;
           motor_stage++;
         }
       }else if(motor_stage == 1){
-        if(exec_stage && currentMillis - motor_time < 4000){
-          motor.step(-steps / 100);
-        }else if (exec_stage && currentMillis - motor_time < 6000){
+        if(exec_stage && currentMillis - motor_time < 800){
+          digitalWrite(buzzer, LOW);
           motor.step(steps / 100);
+        }else if (exec_stage && currentMillis - motor_time < 6000){
+          //motor.step(steps / 100);
         }else if(exec_stage){
           motor_time = currentMillis;
           exec_stage = false;
